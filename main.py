@@ -9,7 +9,7 @@ from processor.log_processor import FlowLogProcessor
 from helper import constants
 
 log = Logger().get_logger()
-if __name__=='__main__':
+if __name__ == '__main__':
     
     # Default file paths
     default_lookup_table_file = constants.LOOKUP_TABLE_FILE_PATH
@@ -34,7 +34,8 @@ if __name__=='__main__':
     count_with_tag = manager.dict()
     count_with_pairs = manager.dict()
 
-    tag_dict_lock = threading.Lock()  # Lock to ensure thread safety
+    # Thread lock for safe writing
+    tag_dict_lock = threading.Lock()  
     pair_dict_lock = threading.Lock()
 
     # Split the original file into temporary files
@@ -46,7 +47,7 @@ if __name__=='__main__':
         log_parser = FlowLogProcessor( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
         log_parser.process_logs()
 
-     # Create processes for each temp file
+    # Create processes for each chunk
     processes = []
     for temp_file in temp_files:
         p = multiprocessing.Process(target=process_task, args=(protocol_table_data, lookup_table_data, temp_file, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock))
@@ -61,8 +62,8 @@ if __name__=='__main__':
     for temp_file in temp_files:
         os.remove(temp_file)   
 
-    print(f"Count With Tag {count_with_tag}")
-    print(f"Count with pairs {count_with_pairs}")
     
     # Generate the output file
     helper_object.write_output_to_file(count_with_tag, count_with_pairs)
+
+    print(f"Process completed successfully !!! Please find the output file at {output_file}")

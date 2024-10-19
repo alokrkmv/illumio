@@ -1,5 +1,6 @@
 import logging
 
+
 class Logger:
     def __init__(self):
         # Create a logger
@@ -13,5 +14,7 @@ class Logger:
 
         # Add the handler to the logger
         self.logger.addHandler(self.handler)
+
     def get_logger(self):
         return self.logger
+        

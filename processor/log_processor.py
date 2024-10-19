@@ -13,7 +13,6 @@ class FlowLogProcessor:
     def __init__(self, protocol_dict : dict, lookup_table_dict : dict, 
                 temp_file_path : str, count_with_tag : dict, count_with_pair : dict,
                 tag_dict_lock, pair_dict_lock):
-        # Initializing the logger
         self.log = Logger().get_logger()
         self.protocol_dict = protocol_dict
         self.lookup_table_dict = lookup_table_dict
@@ -32,8 +31,8 @@ class FlowLogProcessor:
         try:
             with open(self.temp_file_path, mode='r') as file:
                 reader = csv.reader(file, delimiter=' ')
-                for log in reader:  # Iterate directly over the CSV reader
-                    if not log:  # Skip empty lines if they exist
+                for log in reader:
+                    if not log:
                         continue
                     
                     parser = self.parser(log[0])

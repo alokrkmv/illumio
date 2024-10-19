@@ -37,4 +37,7 @@ class TestHelper:
     def test_generate_temp_files(self):
         temp_files = self.helper_obj.generate_temp_files(constants.FLOW_LOG_FILE_PATH, constants.TEMP_DIRECTORY_PATH, self.number_of_workers)
         assert(len(temp_files) == self.number_of_workers)
+        # Remove the temporary files
+        for temp_file in temp_files:
+            os.remove(temp_file) 
 
