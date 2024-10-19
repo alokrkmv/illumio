@@ -27,7 +27,7 @@ tags = [
 ]
 
 # Function to generate a random mapping of port, protocol, and tag
-def generate_data(num_records=100):
+def generate_data(num_records=10000):
     data = []
     
     for _ in range(num_records):
@@ -54,9 +54,9 @@ def save_to_csv(filename, data):
         writer.writerows(data)
 
 # Generate 100 records of data
-data = generate_data(100)
+data = generate_data()
 
 # Save to a CSV file
 save_to_csv('generated_lookup_table.csv', data)
 
-print("Data generation complete. Saved to 'protocol_lookup.csv'.")
+print("Data generation complete. Saved to 'generated_lookup_table.csv'.")

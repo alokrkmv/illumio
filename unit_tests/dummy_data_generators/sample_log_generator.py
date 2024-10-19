@@ -17,7 +17,7 @@ protocols_ports = {
     "imap": [143]
 }
 
-def generate_data(protocol):
+def generate_data():
     # Generating example values
     version = 2
     packet_id = random.randint(100000000000, 999999999999)
@@ -42,9 +42,8 @@ def generate_data(protocol):
 
 # Generate 100 lines of data
 data_lines = []
-for _ in range(100):
-    protocol = random.choice(['TCP', 'UDP'])  # Randomly choose between TCP and UDP
-    data_lines.append(generate_data(protocol))
+for _ in range(100000):
+    data_lines.append(generate_data())
 
 # Write the generated data to a .log file
 with open('generated_data.log', 'w') as log_file:
