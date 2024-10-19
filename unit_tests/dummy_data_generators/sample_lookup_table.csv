@@ -1,0 +1,16 @@
+dstport,protocol,tag
+143,tcp,dhcp
+53,udp,security
+443,dns,sv_P4
+143,imap,load_balancer
+67,dhcp,sv_P1
+161,snmp,snmp
+68,dhcp,load_balancer
+123,ntp,snmp
+993,tcp,ftp
+110,pop3,sv_P3
+110,pop3,dhcp
+443,https,vpn
+25,smtp,monitor
+143,imap,sv_P4
+128,icmp,sv_P1

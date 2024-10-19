@@ -1,9 +1,15 @@
+import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Get current file directory
+project_root = os.path.dirname(current_dir)  # Get the parent directory (project root)
+sys.path.append(project_root)
+
 import csv
 
 from helper.logger import Logger
 
 
-class FlowLogParser:
+class FlowLogProcessor:
     def __init__(self, protocol_dict : dict, lookup_table_dict : dict, 
                 temp_file_path : str, count_with_tag : dict, count_with_pair : dict,
                 tag_dict_lock, pair_dict_lock):
@@ -18,40 +24,46 @@ class FlowLogParser:
         self.pair_dict_lock = pair_dict_lock
     
 
-
     def process_logs(self):
         """
-            Process the flow log and writes the result into thread safe shared dict.
+        Process the flow log and writes the result into a thread-safe shared dict.
         """
         
         try:
             with open(self.temp_file_path, mode='r') as file:
                 reader = csv.reader(file, delimiter=' ')
-                flow_logs = list(reader)
-                for log in flow_logs:
+                for log in reader:  # Iterate directly over the CSV reader
+                    if not log:  # Skip empty lines if they exist
+                        continue
+                    
                     parser = self.parser(log[0])
                     dstport, protocol, tag = parser(log)
+                    
                     if not dstport or not protocol or not tag:
                         raise Exception("Unable to fetch relevant data from the logs")
-                    if tag not in self.count_with_tag:
-                        with self.tag_dict_lock:
+                    
+                    # Thread-safe increment for tag count
+                    with self.tag_dict_lock:
+                        if tag not in self.count_with_tag:
                             self.count_with_tag[tag] = 1
-                    else:
-                        with self.tag_dict_lock:
-                            self.count_with_tag[tag]+=1
-                    if (dstport, protocol) not in self.count_with_tag:
-                        with self.pair_dict_lock:
+                        else:
+                            self.count_with_tag[tag] += 1
+                    
+                    # Thread-safe increment for pair count
+                    with self.pair_dict_lock:
+                        if (dstport, protocol) not in self.count_with_pair:
                             self.count_with_pair[(dstport, protocol)] = 1
-                    else:
-                        with self.pair_dict_lock:
-                            self.count_with_pair[(dstport, protocol)]+=1  
+                        else:
+                            self.count_with_pair[(dstport, protocol)] += 1  
+
         except FileNotFoundError:
             self.log.error("File not found!")
         except PermissionError:
             self.log.error("You don't have permission to access this file.")
         except Exception as e:
             self.log.error(f"Reading the file {self.temp_file_path} failed with error: {e}")
-    
+
+
     def parser(self, version):
         match version:
             case "2":
