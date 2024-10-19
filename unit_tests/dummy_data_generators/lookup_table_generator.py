@@ -57,6 +57,6 @@ def save_to_csv(filename, data):
 data = generate_data(100)
 
 # Save to a CSV file
-save_to_csv('data/generated_lookup_table.csv', data)
+save_to_csv('generated_lookup_table.csv', data)
 
 print("Data generation complete. Saved to 'protocol_lookup.csv'.")

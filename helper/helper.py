@@ -1,3 +1,9 @@
+import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Get current file directory
+project_root = os.path.dirname(current_dir)  # Get the parent directory (project root)
+sys.path.append(project_root)
+
 import csv
 from .logger import Logger
 
@@ -29,16 +35,16 @@ class Helper:
 
 
     
-    def load_lookup_table_data(self, lookup_table_file_path : str = None) -> dict:
+    def load_lookup_table_data(self) -> dict:
         """
             Loads the lookup table and creates a in memory dictionary with (dstport, protocol) as key and tag as value
-            Args:
-                lookup_table_file_path: Path to the lookup file.
-
+         
             Returns:
                 dict: An in memory dict of lookup_table.
         """
-        lookup_file = lookup_table_file_path if lookup_table_file_path else self.lookup_table_file_path
+        # import pdb
+        # pdb.set_trace()
+        lookup_file = self.lookup_table_file_path
         
         if not lookup_file:
             raise Exception("Looktable path cannot be none") 
@@ -53,16 +59,13 @@ class Helper:
             lookup_table[(dstport, protocol.lower())] = tag
         return lookup_table
 
-    def load_protocol_data(self, protocol_mapping_file_path : str = None) -> dict:
+    def load_protocol_data(self) -> dict:
         """
             Loads the port data and creates an in memory dictionary with port_number as key and portname as value
-            Args:
-                port_mapping_file_path: Path to the port mapping file.
-
             Returns:
                 dict: An in memory dict of port mapping table.
         """
-        protocol_file = protocol_mapping_file_path if protocol_mapping_file_path else self.protocol_mapping_file_path
+        protocol_file = self.protocol_mapping_file_path
         
         if not protocol_file:
             raise Exception("Protocol mapping file path cannot be none") 
@@ -80,29 +83,34 @@ class Helper:
 
     def generate_temp_files(self, log_file_path, temp_directory, number_of_workers):
         """
-            Splits the log files into multiple chunks.
-            Args:
-                input_file_path: Input log file path
-                num_workers: Number of worker processes
+        Splits the log files into multiple chunks.
+        
+        Args:
+            log_file_path: Input log file path
+            temp_directory: Directory to store temporary files
+            number_of_workers: Number of worker processes
         """
-        temp_files = []
+        temp_files = [f'{temp_directory}/worker_{i}.log' for i in range(number_of_workers)]
+
+        # Open the main log file for reading
         with open(log_file_path, 'r') as f:
-            lines = f.readlines()
+            # Initialize temp file handles
+            temp_file_handles = [open(temp_file, 'w') for temp_file in temp_files]
+
+            try:
+                # Iterate through each line in the log file
+                for line_number, line in enumerate(f):
+                    # Determine which temp file to write to based on the line number
+                    worker_index = line_number % number_of_workers
+                    temp_file_handles[worker_index].write(line)
+            
+            finally:
+                # Make sure to close all temp file handles
+                for handle in temp_file_handles:
+                    handle.close()
         
-        # Divide the entire data into number of chunks equal to the number of workers process spawned
-        chunk_size = len(lines) // number_of_workers + (len(lines) % number_of_workers > 0)
-        
-        for i in range(number_of_workers):
-            temp_file_path = f'{temp_directory}/worker_{i}.log'
-            temp_files.append(temp_file_path)
-            with open(temp_file_path, 'w') as temp_file:
-                for _ in range(chunk_size):
-                    if lines:
-                        temp_file.write(lines.pop(0))
-                    else:
-                        break
-    
         return temp_files
+
 
     def write_output_to_file(self, count_with_tag, count_with_pairs):
         """
@@ -126,7 +134,6 @@ class Helper:
             
             # Sort tag_dict by tag name
             sorted_tags = sorted(count_with_tag.items())
-            print(sorted_tags)
 
             for tag, count in sorted_tags:
                 file.write(f"{tag},{count}\n")

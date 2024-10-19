@@ -1,15 +1,28 @@
 import os
+import sys
 import multiprocessing
 import threading
 
 from helper.helper import Helper
 from helper.logger import Logger
-from parser.log_parser import FlowLogParser
+from processor.log_processor import FlowLogProcessor
 from helper import constants
 
 log = Logger().get_logger()
 if __name__=='__main__':
-    helper_object = Helper(constants.LOOKUP_TABLE_FILE_PATH, constants.PROTOCOL_MAPPING_FILE_PATH, constants.OUTPUT_FILE_PATH)
+    
+    # Default file paths
+    default_lookup_table_file = constants.LOOKUP_TABLE_FILE_PATH
+    default_log_file_path = constants.FLOW_LOG_FILE_PATH
+    default_output_file = constants.OUTPUT_FILE_PATH
+    
+
+    # Check if command-line arguments are passed, otherwise use default paths
+    lookup_table_file = sys.argv[1] if len(sys.argv) > 1 else default_lookup_table_file
+    log_file_path = sys.argv[2] if len(sys.argv) > 2 else default_log_file_path
+    output_file = sys.argv[3] if len(sys.argv) > 3 else default_output_file
+
+    helper_object = Helper(lookup_table_file, constants.PROTOCOL_MAPPING_FILE_PATH, output_file)
     lookup_table_data = helper_object.load_lookup_table_data()
     protocol_table_data = helper_object.load_protocol_data()
 
@@ -25,12 +38,12 @@ if __name__=='__main__':
     pair_dict_lock = threading.Lock()
 
     # Split the original file into temporary files
-    temp_files = helper_object.generate_temp_files(constants.FLOW_LOG_FILE_PATH, constants.TEMP_DIRECTORY_PATH, constants.NUMBER_OF_WORKERS)
+    temp_files = helper_object.generate_temp_files(log_file_path, constants.TEMP_DIRECTORY_PATH, constants.NUMBER_OF_WORKERS)
 
     def process_task(protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, 
                     count_with_pairs, tag_dict_lock, pair_dict_lock):
         # Create an instance of MyObject in each process
-        log_parser = FlowLogParser( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
+        log_parser = FlowLogProcessor( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
         log_parser.process_logs()
 
      # Create processes for each temp file
@@ -47,6 +60,9 @@ if __name__=='__main__':
     # Remove the temporary files
     for temp_file in temp_files:
         os.remove(temp_file)   
+
+    print(f"Count With Tag {count_with_tag}")
+    print(f"Count with pairs {count_with_pairs}")
     
     # Generate the output file
     helper_object.write_output_to_file(count_with_tag, count_with_pairs)
