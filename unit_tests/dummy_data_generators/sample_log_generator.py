@@ -17,6 +17,8 @@ protocols_ports = {
     "imap": [143]
 }
 
+number_of_items = 100000
+
 def generate_data():
     # Generating example values
     version = 2
@@ -42,7 +44,7 @@ def generate_data():
 
 # Generate 100 lines of data
 data_lines = []
-for _ in range(100000):
+for _ in range(number_of_items):
     data_lines.append(generate_data())
 
 # Write the generated data to a .log file

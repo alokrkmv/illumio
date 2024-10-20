@@ -25,9 +25,10 @@ tags = [
     "firewall", "load_balancer", "database", "monitor", 
     "security", "iot"
 ]
+number_of_items = 10000
 
 # Function to generate a random mapping of port, protocol, and tag
-def generate_data(num_records=10000):
+def generate_data(num_records=number_of_items):
     data = []
     
     for _ in range(num_records):
