@@ -9,13 +9,11 @@ from processor.log_processor import FlowLogProcessor
 from helper import constants
 
 def process_task(protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, 
-                    count_with_pairs):
+                    count_with_pairs, tag_dict_lock, pair_dict_lock):
         # Create an instance of MyObject in each process
         log_parser = FlowLogProcessor( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
         log_parser.process_logs()
-# Thread lock for safe writing
-tag_dict_lock = threading.Lock()  
-pair_dict_lock = threading.Lock()
+
 log = Logger().get_logger()
 if __name__ == '__main__':
     
@@ -41,6 +39,9 @@ if __name__ == '__main__':
     manager = multiprocessing.Manager()
     count_with_tag = manager.dict()
     count_with_pairs = manager.dict()
+    # Process lock for safe writing
+    tag_dict_lock = manager.Lock()  
+    pair_dict_lock = manager.Lock()
 
     
 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     # Create processes for each chunk
     processes = []
     for temp_file in temp_files:
-        p = multiprocessing.Process(target=process_task, args=(protocol_table_data, lookup_table_data, temp_file, count_with_tag, count_with_pairs))
+        p = multiprocessing.Process(target=process_task, args=(protocol_table_data, lookup_table_data, temp_file, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock))
         processes.append(p)
         p.start()
 
