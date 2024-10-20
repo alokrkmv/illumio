@@ -3,6 +3,7 @@
 Write a program to parse a file containing flow log data and map each row to a tag based on a lookup table. The lookup table is defined as a CSV file, and it has 3 columns, dstport, protocol, and tag. The dstport and protocol combination decide what tag can be applied.
 
 ###  Steps to run the project.
+1. Requires **python version >=3.10.x**
 1. Clone the repo into the local machine.
 2. Make sure your current branch is **Main**.
 3. cd into the root **illumio** folder
