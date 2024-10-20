@@ -8,6 +8,14 @@ from helper.logger import Logger
 from processor.log_processor import FlowLogProcessor
 from helper import constants
 
+def process_task(protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, 
+                    count_with_pairs):
+        # Create an instance of MyObject in each process
+        log_parser = FlowLogProcessor( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
+        log_parser.process_logs()
+# Thread lock for safe writing
+tag_dict_lock = threading.Lock()  
+pair_dict_lock = threading.Lock()
 log = Logger().get_logger()
 if __name__ == '__main__':
     
@@ -34,23 +42,15 @@ if __name__ == '__main__':
     count_with_tag = manager.dict()
     count_with_pairs = manager.dict()
 
-    # Thread lock for safe writing
-    tag_dict_lock = threading.Lock()  
-    pair_dict_lock = threading.Lock()
+    
 
     # Split the original file into temporary files
     temp_files = helper_object.generate_temp_files(log_file_path, constants.TEMP_DIRECTORY_PATH, constants.NUMBER_OF_WORKERS)
 
-    def process_task(protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, 
-                    count_with_pairs, tag_dict_lock, pair_dict_lock):
-        # Create an instance of MyObject in each process
-        log_parser = FlowLogProcessor( protocol_table_data, lookup_table_data, temp_file_path, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock)
-        log_parser.process_logs()
-
     # Create processes for each chunk
     processes = []
     for temp_file in temp_files:
-        p = multiprocessing.Process(target=process_task, args=(protocol_table_data, lookup_table_data, temp_file, count_with_tag, count_with_pairs, tag_dict_lock, pair_dict_lock))
+        p = multiprocessing.Process(target=process_task, args=(protocol_table_data, lookup_table_data, temp_file, count_with_tag, count_with_pairs))
         processes.append(p)
         p.start()
 
