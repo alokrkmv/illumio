@@ -64,11 +64,10 @@ class FlowLogProcessor:
 
 
     def parser(self, version):
-        match version:
-            case "2":
-                return self.version_2_parser
-            case _:
-                return None
+        if version == "2":
+            return self.version_2_parser
+        else:
+            return None
     def version_2_parser(self, raw_log):
         try:
             # Extract necessary columns from the flow log
