@@ -10,7 +10,7 @@ Write a program that can parse a file containing flow log data and maps each row
 5. The results will be stored in a txt file and the location of the file can be retrieved from console output. By default it is ````data/output/output.txt````
 
 ###  Assumptions made
-**The following assumptions were made while designing the system
+**The following assumptions were made while designing the system**
 1. Version of logs will be 2.
 2. The structure of the lookup table won't change
 3. The entire log file resides in a single data source.
