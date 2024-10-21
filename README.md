@@ -64,5 +64,5 @@ Entire load testing was performed on a machine with a 2-core CPU and 8 GB RAM ma
 #### Scope of Improvement
 
 1. Fault tolerance can be added to respin a new worker process in case an existing one dies.
-2. Instead of spinning a default number of worker process we can have a logic in place to spin the number of workers based on job size.
+2. Instead of spinning a default number of worker process we can have a logic in place to spin the number of workers based on job size or number of cores available
 
