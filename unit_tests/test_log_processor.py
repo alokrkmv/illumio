@@ -1,15 +1,12 @@
 import sys
 import os
 import pytest
-import multiprocessing
-import threading
 current_dir = os.path.dirname(os.path.abspath(__file__))  # Get current file directory
 project_root = os.path.dirname(current_dir)  # Get the parent directory (project root)
 sys.path.append(project_root)
 
 
 from processor.log_processor import FlowLogProcessor
-from helper import constants
 
 class TestFlowLogProcessor:
     # Arrange
@@ -24,21 +21,14 @@ class TestFlowLogProcessor:
         'ftp', ('110', 'pop3'): 'dhcp', ('443', 'https'): 'vpn', ('25', 'smtp'): 
         'monitor', ('128', 'icmp'): 'sv_P1'}
         self.temp_file_path = "unit_tests/dummy_data_generators/sample_log.log"
-        self.manager = multiprocessing.Manager()
-        self.count_with_tag = {}
-        self.count_with_pairs = {}
-
-        self.tag_dict_lock = threading.Lock()  # Lock to ensure thread safety
-        self.pair_dict_lock = threading.Lock()
-        self.processor_object = FlowLogProcessor(self.protocol_dict, self.lookup_table_dict, self.temp_file_path,
-                                                self.count_with_tag, self.count_with_pairs, self.tag_dict_lock, self.pair_dict_lock)
+        self.processor_object = FlowLogProcessor(self.protocol_dict, self.lookup_table_dict, self.temp_file_path)
     
     
     # execute and assert
     def test_process_logs(self):
-        self.processor_object.process_logs()
-        assert(self.expected_count_with_tag == self.count_with_tag)
-        assert(self.expected_count_with_pair == self.count_with_pairs)
+        count_with_tag, count_with_pairs = self.processor_object.process_logs()
+        assert(self.expected_count_with_tag == count_with_tag)
+        assert(self.expected_count_with_pair == count_with_pairs)
 
     # execute and assert
     def test_version_2_parser(self):
@@ -50,4 +40,3 @@ class TestFlowLogProcessor:
         assert(excepted_dstport == actual_dstport)
         assert(expected_protocol == actual_protocol)
         assert(expected_tag == actual_tag)
-
