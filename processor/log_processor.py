@@ -11,23 +11,19 @@ from helper.logger import Logger
 
 class FlowLogProcessor:
     def __init__(self, protocol_dict : dict, lookup_table_dict : dict, 
-                temp_file_path : str, count_with_tag : dict, count_with_pair : dict,
-                tag_dict_lock, pair_dict_lock):
+                temp_file_path : str):
         self.log = Logger().get_logger()
         self.protocol_dict = protocol_dict
         self.lookup_table_dict = lookup_table_dict
         self.temp_file_path = temp_file_path
-        self.count_with_tag = count_with_tag
-        self.count_with_pair = count_with_pair
-        self.tag_dict_lock = tag_dict_lock
-        self.pair_dict_lock = pair_dict_lock
-    
-
+      
     def process_logs(self):
         """
         Process the flow log and writes the result into a thread-safe shared dict.
         """
-        
+        count_with_tag = {}
+        count_with_pair = {}
+
         try:
             with open(self.temp_file_path, mode='r') as file:
                 reader = csv.reader(file, delimiter=' ')
@@ -41,19 +37,17 @@ class FlowLogProcessor:
                     if not dstport or not protocol or not tag:
                         raise Exception("Unable to fetch relevant data from the logs")
                     
-                    # Thread-safe increment for tag count
-                    with self.tag_dict_lock:
-                        if tag not in self.count_with_tag:
-                            self.count_with_tag[tag] = 1
-                        else:
-                            self.count_with_tag[tag] += 1
+                
+                    if tag not in count_with_tag:
+                        count_with_tag[tag] = 1
+                    else:
+                        count_with_tag[tag] += 1
                     
-                    # Thread-safe increment for pair count
-                    with self.pair_dict_lock:
-                        if (dstport, protocol) not in self.count_with_pair:
-                            self.count_with_pair[(dstport, protocol)] = 1
-                        else:
-                            self.count_with_pair[(dstport, protocol)] += 1  
+            
+                    if (dstport, protocol) not in count_with_pair:
+                        count_with_pair[(dstport, protocol)] = 1
+                    else:
+                        count_with_pair[(dstport, protocol)] += 1  
 
         except FileNotFoundError:
             self.log.error("File not found!")
@@ -61,6 +55,8 @@ class FlowLogProcessor:
             self.log.error("You don't have permission to access this file.")
         except Exception as e:
             self.log.error(f"Reading the file {self.temp_file_path} failed with error: {e}")
+        finally:
+            return count_with_tag, count_with_pair
 
 
     def parser(self, version):
