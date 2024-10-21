@@ -9,6 +9,12 @@ Write a program that can parse a file containing flow log data and maps each row
 4. To run the program and generate output run ````bash run.sh <lookup_table_path> <log_file_path> <output_file_path>````. The command line arguments are optional and if not provided then default paths will be used.
 5. The results will be stored in a txt file and the location of the file can be retrieved from console output. By default it is ````data/output/output.txt````
 
+###  Assumptions made
+**The following assumptions were made while designing the system
+1. Version of logs will be 2.
+2. The structure of the lookup table won't change
+3. The entire log file resides in a single data source.
+   
 ###  Testing and evaluation
 #### Unit testing:
 1. you can run the entire test suit using the bash file ````bash run_unit_tests.sh````
@@ -54,7 +60,7 @@ Entire load testing was performed on a machine with a 2-core CPU and 8 GB RAM ma
 
 #### Time and Space complexity analysis
 1. The time complexity of the code is O(N) where N is the number of log lines in each chunk for a particular process
-2. As the entire lookup table is stored in memory space complexity is O(N) where N is the size of the lookup table. In the current implementation, I am not loading logs into memory and each process is reading and processing the logs one line at a time hence the space complexity of log processing is O(1).
+2. As the entire lookup table is stored in memory space complexity is O(T) where T is the size of the lookup table. In the current implementation, I am not loading logs into memory and each process is reading and processing the logs one line at a time hence the space complexity of log processing is O(1).
 #### Scope of Improvement
 
 1. Fault tolerance can be added to respin a new worker process in case an existing one dies.
