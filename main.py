@@ -30,7 +30,7 @@ def merge_dictionaries(dict_list):
 
 if __name__ == '__main__':
 
-   
+    start_time = time.time()
     # Default file paths
     default_lookup_table_file = constants.LOOKUP_TABLE_FILE_PATH
     default_log_file_path = constants.FLOW_LOG_FILE_PATH
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         p.join()
 
     # # Create processes for each chunk
-    start_time = time.time()
+    
 
     count_with_tag_results = []
     count_with_pair_results = []
