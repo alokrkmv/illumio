@@ -44,9 +44,9 @@ Entire load testing was performed on a machine with a 2-core CPU and 8 GB RAM ma
 1. Checkout to **load_testing** branch.
 2. ````cd unit_tests/dummy_data_generators````
 3. Set the number of key mappings you want in lookup_tables  in **number_of_items** variable in **lookup_table_generator.py**. The default value is 10000
-4. Execute ````python lookup_table_generator.py``` to generate the lookup table
+4. Execute ````python lookup_table_generator.py```` to generate the lookup table
 5. Set the number of logs you want  to generate  in **number_of_items** variable in **sample_log_generator.py**. The default value is 100000
-6. Execute ````python sample_log_generator.py``` to generate the log data
+6. Execute ````python sample_log_generator.py```` to generate the log data
 7. Once the lookup table and log data are generated, you can perform load testing by running the command ````bash run.sh unit_tests/dummy_data_generators/generated_lookup_table.csv unit_tests/dummy_data_generators/generated_data.log unit_tests/test_output.txt 4````
 8. Where ````unit_tests/dummy_data_generators/generated_lookup_table.csv```` is path to the generated lookup table, ````dummy_data_generators/generated_data.log```` is path to the generated logs, ````unit_tests/test_output.txt```` path to the load testing output file and  ````4```` is number of worker process you want to spin.
 9. The maximum number of worker processes that can be spun has been limited to 10 to prevent resource overuse.
