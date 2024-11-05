@@ -88,6 +88,9 @@ class Helper:
             temp_directory: Directory to store temporary files
             number_of_workers: Number of worker processes
         """
+        if number_of_workers == 1:
+            temp_files = [log_file_path]
+            return
         temp_files = [f'{temp_directory}/worker_{i}.log' for i in range(number_of_workers)]
 
         with open(log_file_path, 'r') as f:

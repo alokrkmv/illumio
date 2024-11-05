@@ -91,8 +91,9 @@ if __name__ == '__main__':
     final_count_with_pair = merge_dictionaries(count_with_pair_results)
 
     # Remove the temporary files
-    for temp_file in temp_files:
-        os.remove(temp_file)   
+    if constants.NUMBER_OF_WORKERS>1:
+        for temp_file in temp_files:
+            os.remove(temp_file)   
 
     # Generate the output file
     helper_object.write_output_to_file(final_count_with_tag, final_count_with_pair)
